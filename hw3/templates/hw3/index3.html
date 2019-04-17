@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<style>
+
+h3 {
+  color: SteelBlue	;
+}
+
+th, td {
+  padding: 5px;
+  text-align: center;
+
+}
+table th {
+  width: 30%;    
+  background-color: PaleTurquoise;
+}
+
+</style>
+</head>
+
+<body>
+<h3 align="center">WEATHER FORECAST</h3>
+
+<input type="radio" onclick="if(this.checked){sub_get1()}">
+Dates of available Weather
+</br><input type="radio" onclick="if(this.checked){myFunction2()}">
+Weather info for a particular date
+</br><input type="radio" onclick="if(this.checked){myFunction3()}">
+Add Weather info for a particular date
+</br><input type="radio" onclick="if(this.checked){myFunction4()}">
+Delete Weather info for a particular date
+
+<div id="demo1"></div>
+<div id="demo"></div>
+
+<script>
+
+function myFunction2() {
+document.getElementById("demo").innerHTML = ""
+document.getElementById("demo1").innerHTML = '<label for="date2">Enter DATE:</label><input type="number" id="date2" placeholder="YYYYMMDD" min="20130101" max="20190327" required><button type="submit" onclick="sub_get2()">Weather Info</button>'
+}
+
+function myFunction3() {
+document.getElementById("demo").innerHTML = ""
+document.getElementById("demo1").innerHTML = '<label for="date4">Enter DATE:</label><input type="number" id="date4" placeholder="YYYYMMDD" min="20130101" required><br><label for="tmax4">Enter TMAX:</label><input type="text" id="tmax4"><br><label for="tmin4">Enter TMIN:</label><input type="text" id="tmin4"><br><button type="submit" onclick="sub_post()">Add Weather Info</button>'
+}
+
+function myFunction4() {
+document.getElementById("demo").innerHTML = ""
+document.getElementById("demo1").innerHTML = '<label for="date5">Enter DATE:</label><input type="number" id="date5" placeholder="YYYYMMDD" min="20130101" max="20190327" required><button type="submit" onclick="sub_del()">Delete Weather Info</button>'
+}
+
+
+function func_gen(method, url)
+{
+    var txt = "";
+    var ourRequest = new XMLHttpRequest();
+    ourRequest.open(method, url); 
+    if (method=='POST') 
+    {
+        ourRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    }
+    ourRequest.onload = function(){
+        if (ourRequest.status >= 200 && ourRequest.status < 400 )
+        {
+        var ourData = JSON.parse(ourRequest.responseText);
+        txt += "<table style='width:50%' id='t01'><tr><th>DATE</th><th>TMAX</th><th>TMIN</th></tr>";
+        txt += "<tr><td>"+ourData.DATE+"</td><td>"+ourData.TMAX+"</td><td>"+ourData.TMIN+"</td></tr>";
+        txt += "</table>"    
+        }
+        else{
+        txt = 'error'
+        }
+        document.getElementById("demo").innerHTML = txt
+        };
+        
+    if (method=='POST') 
+    {
+        var date4 = document.getElementById("date4").value
+        var tmax4 = document.getElementById("tmax4").value
+        var tmin4 = document.getElementById("tmin4").value
+        var params = 'DATE=' +date4+'&amp;TMAX=' +tmax4+'&amp;TMIN=' +tmin4
+        
+        ourRequest.send(params);
+    } 
+    else 
+    { 
+        ourRequest.send();
+    }
+
+}
+
+function sub_get1(){
+    document.getElementById("demo1").innerHTML = ""
+    var x, txt = "";
+    var str1 = window.location.href;
+    var res = str1.split("hw3");
+    var url = res[0]+'historical/';
+    
+    
+    var ourRequest = new XMLHttpRequest();
+    ourRequest.open('GET', url); 
+    ourRequest.onload = function(){
+        var ourData = JSON.parse(ourRequest.responseText);
+        txt += "<table style='width:50%' id='t01'><tr><th>DATE</th></tr>";
+        for (x in ourData) {
+            txt += "<tr><td>"+ourData[x].DATE+"</td></tr>";
+        }
+        txt += "</table>"
+        document.getElementById("demo").innerHTML = txt
+        };
+    ourRequest.send()
+    };
+
+function sub_get2(){
+    var date2 = document.getElementById("date2").value;
+    var date22 = document.getElementById("date2");
+    var method = 'GET'
+    
+    var str1 = window.location.href;
+    var res = str1.split("hw3");
+    var url = res[0]+'historical/'+date2;
+    
+    
+    if (!date22.checkValidity()) 
+    {
+    document.getElementById("demo").innerHTML = date22.validationMessage;
+    } 
+    else
+    {
+    func_gen(method, url)
+    }
+    
+    };    
+    
+function sub_post(){
+    var method = 'POST'
+    
+    var str1 = window.location.href;
+    var res = str1.split("hw3");
+    var url = res[0]+'historical/';
+    
+    var date4 = document.getElementById("date4").value;
+    var date44 = document.getElementById("date4");
+    if (!date44.checkValidity()) 
+    {
+    document.getElementById("demo").innerHTML = date44.validationMessage;
+    } 
+    else 
+    {
+    func_gen(method, url)
+    }
+    };
+  
+function sub_del(){
+    var date5 = document.getElementById("date5").value;
+    var date55 = document.getElementById("date5")
+    var method = 'DELETE'
+    
+    var str1 = window.location.href;
+    var res = str1.split("hw3");
+    var url = res[0]+'historical/'+date5;
+    
+    if (!date55.checkValidity()) 
+    {
+    document.getElementById("demo").innerHTML = date55.validationMessage;
+    } 
+    else 
+    {
+    func_gen(method, url)
+    }
+    }; 
+    
+</script>
+
+</body>
+</html>
